@@ -39,11 +39,11 @@
 ; Purpose: Returns the concatination of the given two lists, with cont pre-processing
 (define append$
  (lambda (lst1 lst2 cont)
-   (if (empty? x)
-        cont y
-        (append$ ((cdr x) y) (lambda (append-res) cont((cons (car x) (append-res)))))
+   (if (empty? lst1)
+        cont lst2
+        (append$ ((cdr lst1) lst2) (lambda (append-res) cont((cons (car lst1) (append-res)))))
    )
- )
+ ))
 
 ;;; Q1.2
 ; Signature: equal-trees$(tree1, tree2, succ, fail) 

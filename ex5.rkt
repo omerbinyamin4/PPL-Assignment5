@@ -53,9 +53,19 @@
 (define leaf? (lambda (x) (not (list? x))))
 (define equal-trees$ 
  (lambda (tree1 tree2 succ fail)
-   #f;@TODO
- )
-)
+  (cond
+    ((and (empty? tree1) (empty? tree2)) (succ '()))
+    ((or (empty? tree1) (empty? tree2)) (fail (cons tree1 (cons tree2 '()))))
+    ((and (leaf? tree1) (leaf? tree2)) (succ (cons tree1 (cons tree2 '()))))
+    ((or (leaf? tree1) (leaf? tree2)) (fail (cons tree1 (cons tree2 '()))))
+    (else (equal-trees$ (car tree1) (car tree2) (lambda (equal-res-car)
+                                          ((lambda (recResult)
+                                           (cond
+                                             ((empty? recResult) equal-res-car)
+                                             ((empty? equal-res-car) recResult)
+                                             (else (append$ (cons equal-res-car '()) (cons recResult '()) id))))(equal-trees$ (cdr tree1) (cdr tree2) succ fail)))
+                                        id))))
+  )
 
 ;;; Q2a
 ; Signature: reduce1-lzl(reducer, init, lzl) 

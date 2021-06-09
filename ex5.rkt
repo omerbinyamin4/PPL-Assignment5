@@ -40,10 +40,11 @@
 (define append$
  (lambda (lst1 lst2 cont)
    (if (empty? lst1)
-        cont lst2
-        (append$ ((cdr lst1) lst2) (lambda (append-res) cont((cons (car lst1) (append-res)))))
+        (cont lst2)
+        (append$ (cdr lst1) lst2 (lambda (append-res) (cont(cons (car lst1) append-res))))
    )
- ))
+ )
+)
 
 ;;; Q1.2
 ; Signature: equal-trees$(tree1, tree2, succ, fail) 

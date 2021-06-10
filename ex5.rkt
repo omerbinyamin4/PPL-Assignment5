@@ -14,6 +14,15 @@
   (lambda (lzl)
     ((cdr lzl))))
 
+;; Signature: lzl-map(f, lz)
+;; Type: [[T1 -> T2] * Lzl(T1) -> Lzl(T2)]
+(define lzl-map
+  (lambda (f lzl)
+    (if (empty-lzl? lzl)
+      lzl
+      (cons-lzl (f (head lzl))
+                (lambda () (lzl-map f (tail lzl)))))))
+
 ;; Signature: take(lz-lst,n)
 ;; Type: [LzL*Number -> List]
 ;; If n > length(lz-lst) then the result is lz-lst as a List
@@ -73,9 +82,12 @@
 ; Purpose: Returns the reduced value of the given lazy list
 (define reduce1-lzl 
   (lambda (reducer init lzl)
-   #f ;@TODO
+   (if (empty-lzl? lzl)
+       init
+       (reduce1-lzl reducer (reducer init (head lzl)) (tail lzl))
+    )
   )
-)  
+)
 
 ;;; Q2b
 ; Signature: reduce2-lzl(reducer, init, lzl, n) 
@@ -83,7 +95,11 @@
 ; Purpose: Returns the reduced value of the first n items in the given lazy list
 (define reduce2-lzl 
   (lambda (reducer init lzl n)
-    #f ;@TODO
+   (cond
+     ((empty-lzl? lzl) init)
+     ((= n 0) init)
+     (else (reduce2-lzl reducer (reducer init (head lzl)) (tail lzl) (- n 1)))
+    )
   )
 )  
 
@@ -93,9 +109,15 @@
 ; Purpose: Returns the reduced values of the given lazy list items as a lazy list
 (define reduce3-lzl 
   (lambda (reducer init lzl)
-    #f ;@TODO
+    (reduce3-lzl-n reducer init lzl 1)
   )
-)  
+)
+
+(define reduce3-lzl-n
+  (lambda (reducer init lzl n)
+    (cons-lzl (reduce2-lzl reducer init lzl n) (lambda () (reduce3-lzl-n reducer init lzl (+ n 1))))
+  )
+)
  
 ;;; Q2e
 ; Signature: integers-steps-from(from,step) 
@@ -103,7 +125,13 @@
 ; Purpose: Returns a list of integers from 'from' with 'steps' jumps
 (define integers-steps-from
   (lambda (from step)
-    #f ; @TODO
+    (integers-steps-from-const from step)
+  )
+)
+
+(define integers-steps-from-const
+  (lambda (from step)
+    (cons-lzl from (lambda () (integers-steps-from-const (+ from step) step)))
   )
 )
 
@@ -111,8 +139,15 @@
 ; Signature: generate-pi-approximations() 
 ; Type: Empty -> Lzl<Number>
 ; Purpose: Returns the approximations of pi as a lazy list
+(define combine-lists
+  (lambda (lzl1 lzl2)
+    (cons (* (head lzl1) (head lzl2)) (lambda () (combine-lists (tail lzl1) (tail lzl2))))
+    )
+  )
+
 (define generate-pi-approximations
-  (lambda ()
-    #f ; @TODO
+ (lambda ()
+   (let ((lst1 (lzl-map (lambda (x) (/ 1 x)) (integers-steps-from 1 4))) (lst2 (lzl-map (lambda (x) (/ 1 x)) (integers-steps-from 3 4))))
+     (reduce3-lzl + 0 (combine-lists lst1 lst2)))
    )
- )
+  )

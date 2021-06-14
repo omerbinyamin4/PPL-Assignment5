@@ -139,15 +139,15 @@
 ; Signature: generate-pi-approximations() 
 ; Type: Empty -> Lzl<Number>
 ; Purpose: Returns the approximations of pi as a lazy list
-(define combine-lists
-  (lambda (lzl1 lzl2)
-    (cons (* (head lzl1) (head lzl2)) (lambda () (combine-lists (tail lzl1) (tail lzl2))))
-    )
-  )
-
 (define generate-pi-approximations
  (lambda ()
    (let ((lst1 (lzl-map (lambda (x) (/ 1 x)) (integers-steps-from 1 4))) (lst2 (lzl-map (lambda (x) (/ 1 x)) (integers-steps-from 3 4))))
      (reduce3-lzl + 0 (combine-lists lst1 lst2)))
    )
+  )
+
+(define combine-lists
+  (lambda (lzl1 lzl2)
+    (cons (* (head lzl1) (head lzl2) 8) (lambda () (combine-lists (tail lzl1) (tail lzl2))))
+    )
   )
